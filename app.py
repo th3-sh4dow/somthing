@@ -7,18 +7,22 @@ from difflib import get_close_matches
 app = Flask(__name__)
 
 device_app_map = {}
+DEVICE_APPS_DIR = "device_apps"
 
 @app.route("/connect", methods=["GET"])
 def connect_test():
     return jsonify({"status": "connected"}), 200
 
 @app.route('/device_apps', methods=['POST'])
-def receive_apps():
-    data = request.get_json()
-    device_id = request.headers.get('Device-ID', 'default_device')
-    device_app_map[device_id] = data
-    print(f"[✅] App list updated for {device_id}")
-    return jsonify({"status": "received"}), 200
+def device_apps():
+    device_id = request.args.get('device_id')
+    if not device_id:
+        return jsonify({"error": "Missing device_id"}), 400
+    os.makedirs(DEVICE_APPS_DIR, exist_ok=True)
+    apps_json = request.get_data(as_text=True)
+    with open(os.path.join(DEVICE_APPS_DIR, f"{device_id}.json"), "w", encoding="utf-8") as f:
+        f.write(apps_json)
+    return jsonify({"status": "ok"})
 
 @app.route('/get_device_apps/<device_id>', methods=['GET'])
 def get_device_apps(device_id):
@@ -57,23 +61,37 @@ def ask_jarvis():
 
     print(f"[DEBUG] Received query from device: {device_id} → {query}")
 
-    # Smart app open logic
-    best_app = find_best_app_match(query, device_id) if device_id else None
-    if best_app:
+    # MainExecution now returns a dict with 'response' and 'device_action'
+    result = MainExecution(query, device_id)
+    if isinstance(result, dict):
         response_data = {
-            "response": f"Opening {best_app}",
-            "device_action": f"open::{best_app}"
+            "response": result.get("response", "Done."),
+            "device_action": result.get("device_action", "")
         }
-        print("[DEBUG] App match found, returning:", response_data)
-        return jsonify(response_data), 200
+    else:
+        # fallback for legacy tuple return
+        try:
+            final_output, device_action = result
+            response_data = {
+                "response": final_output or "Done.",
+                "device_action": device_action if isinstance(device_action, str) else (device_action.get("command", "") if device_action else "")
+            }
+        except Exception:
+            response_data = {
+                "response": str(result),
+                "device_action": ""
+            }
 
-    # fallback to MainExecution if not an app open command or no match
-    final_output, device_action = MainExecution(query, device_id)
-    response_data = {
-        "response": final_output or "Done.",
-        "device_action": device_action["command"] if device_action and "command" in device_action else ""
-    }
-    print("[DEBUG] Returning:", response_data)
+    # If modal decided to open an app, check if it's actually available on device
+    if response_data["device_action"] and isinstance(response_data["device_action"], str) and response_data["device_action"].startswith("open::") and device_id:
+        appname = response_data["device_action"].split("::")[1].strip()
+        best_app = find_best_app_match(f"open {appname}", device_id)
+        if best_app:
+            response_data["device_action"] = f"open::{best_app}"
+        else:
+            response_data["device_action"] = ""
+
+    print("[DEBUG] Final response data:", response_data)
     return jsonify(response_data), 200
 
 if __name__ == "__main__":

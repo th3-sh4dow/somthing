@@ -1,6 +1,7 @@
 import cohere
 from rich import print
 from dotenv import dotenv_values
+import random
 
 
 env_vars = dotenv_values(".env")
@@ -52,18 +53,6 @@ ChatHistory = [
         {"role": "Chatbot", "message": "general what is todaye's date, reminder 11:00pm 5th aug dancing performance"},
         {"role": "User", "message": "chat with me."},
         {"role": "Chatbot", "message": "general chat with me."},
-        {"role": "User", "message": "what's my battery percentage?"},
-        {"role": "Chatbot", "message": "mobile what's my battery percentage?"},
-        {"role": "User", "message": "take a screenshot"},
-        {"role": "Chatbot", "message": "mobile take a screenshot"},
-        {"role": "User", "message": "how much storage is left?"},
-        {"role": "Chatbot", "message": "mobile how much storage is left?"},
-        {"role": "User", "message": "turn on bluetooth"},
-        {"role": "Chatbot", "message": "mobile turn on bluetooth"},
-        {"role": "User", "message": "enable hotspot"},
-        {"role": "Chatbot", "message": "mobile enable hotspot"},
-        {"role": "User", "message": "tell me my device info"},
-        {"role": "Chatbot", "message": "mobile tell me my device info"},
 ]
 
 def FirstLayerDMM(prompt: str = "test"):
@@ -125,5 +114,26 @@ if __name__ == "__main__":
     while True:
        
         print(FirstLayerDMM(input("Enter your query: ")))
-        
+
+def fallback_app_not_found(app_name: str, device_type: str = "device") -> str:
+    """
+    Generate a polite, context-aware fallback phrase if an app is not found,
+    with device-specific phrasing for PC or Android.
+    """
+    device_label = {
+        "android": "your phone",
+        "pc": "your computer",
+        "desktop": "your computer",
+        "windows": "your PC",
+        "device": "your device"
+    }.get(device_type.lower(), "your device")
+
+    fallback_templates = [
+        f"Sorry, I couldn't find {app_name} on {device_label}. Would you like to try another app?",
+        f"It looks like {app_name} isn't installed on {device_label}. Want to open something else?",
+        f"{app_name} doesn't seem to be available on {device_label}. Please check the app name or try a different one.",
+        f"I'm unable to locate {app_name} on {device_label}. Would you like to attempt opening another app?"
+    ]
+    return random.choice(fallback_templates)
+
 
