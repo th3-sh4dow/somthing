@@ -1,0 +1,45 @@
+I'd be happy to help! Here is a simple program in C that creates a calculator using a switch case statement:
+
+```c
+#include <stdio.h>
+
+int main() {
+    float num1, num2;
+    char operation;
+
+    printf("Enter the first number: ");
+    scanf("%f", &num1);
+
+    printf("Enter the operation (+, -, *, /): ");
+    scanf(" %c", &operation);
+
+    printf("Enter the second number: ");
+    scanf("%f", &num2);
+
+    switch(operation) {
+        case '+':
+            printf("%.2f + %.2f = %.2f\n", num1, num2, num1 + num2);
+            break;
+        case '-':
+            printf("%.2f - %.2f = %.2f\n", num1, num2, num1 - num2);
+            break;
+        case '*':
+            printf("%.2f * %.2f = %.2f\n", num1, num2, num1 * num2);
+            break;
+        case '/':
+            if(num2 != 0) {
+                printf("%.2f / %.2f = %.2f\n", num1, num2, num1 / num2);
+            } else {
+                printf("Error! Division by zero is not allowed.\n");
+            }
+            break;
+        default:
+            printf("Error! Invalid operation.\n");
+            break;
+    }
+
+    return 0;
+}
+```
+
+This program will ask the user to enter two numbers and an operation (+, -, \*, /). Based on the operation entered, it will perform the corresponding calculation and display the result. If the user enters an invalid operation, it will display an error message. If the user tries to divide by zero, it will also display an error message.

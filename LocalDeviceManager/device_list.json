@@ -1,0 +1,14 @@
+{
+  "my_phone": {
+    "ip": "192.168.135.161",
+    "type": "android",
+    "interface": "http",
+    "commands": ["vibrate", "sms", "call"]
+  },
+  "shubham_phone": {
+    "ip": "192.168.0.106",
+    "type": "android",
+    "interface": "adb",
+    "commands": ["open_app", "camera"]
+  }
+}
