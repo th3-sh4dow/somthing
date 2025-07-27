@@ -1,0 +1,52 @@
+# Enhanced Jarvis AI System Requirements
+# Additional dependencies for advanced NLP/NLU capabilities
+
+# Core NLP libraries
+spacy>=3.7.0
+fuzzywuzzy>=0.18.0
+python-Levenshtein>=0.21.0
+
+# Enhanced language processing
+googletrans>=4.0.0rc1
+mtranslate>=1.8
+
+# Async support
+aiohttp>=3.8.0
+asyncio
+
+# Enhanced automation
+pyautogui>=0.9.54
+keyboard>=0.13.5
+psutil>=5.9.0
+
+# AI/ML enhancements
+cohere>=5.0.0
+groq>=0.28.0
+
+# Web scraping and search
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+googlesearch-python>=1.3.0
+
+# Image and media processing
+Pillow>=10.0.0
+pygame>=2.5.0
+
+# Text-to-speech and speech-to-text
+edge-tts>=7.0.0
+playsound>=1.2.2
+speechrecognition>=3.10.0
+pyaudio>=0.2.14
+
+# System automation
+AppOpener>=1.7
+pywhatkit>=5.4.0
+
+# Environment and configuration
+python-dotenv>=1.0.0
+
+# Rich console output
+rich>=13.0.0
+
+# Install spaCy English model
+# Run after installing: python -m spacy download en_core_web_sm 

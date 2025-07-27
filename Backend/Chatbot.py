@@ -1,7 +1,9 @@
+import cohere
 from groq import Groq
 from json import load, dump
 import datetime
 from dotenv import dotenv_values
+
 
 env_vars = dotenv_values(".env")
 
@@ -58,13 +60,18 @@ def AnswerMofifier(Answer):
 
 
 def ChatBot(Query):
-    """ this function send the user's query to the chatbot and rerturn the AI's response. """
+    """Send the user's query to the chatbot and return the AI's response."""
     try:
-        with open(r"Data\ChatLog.json", "r") as f:
-            messages = load(f)
-    
+        # Try reading chat history
+        try:
+            with open(r"Data\ChatLog.json", "r") as f:
+                messages = load(f)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            messages = []
+
         messages.append({"role": 'user', "content": f"{Query}"})
-    
+
+        # Send request to Groq
         completion = client.chat.completions.create(
             model="llama3-70b-8192",
             messages=SystemChatBot + [{"role": "system", "content": RealtimeInformation()}] + messages,
@@ -74,26 +81,25 @@ def ChatBot(Query):
             stream=True,
             stop=None
         )
-    
+
         Answer = ""
         for chunk in completion:
             if chunk.choices[0].delta.content:
                 Answer += chunk.choices[0].delta.content
-            
-        Answer = Answer.replace("</ s>","")
-    
+
+        Answer = Answer.replace("</ s>", "")
         messages.append({"role": "assistant", "content": Answer})
-    
-        with open(r"Data\ChatLog.jsopn", "w") as f:
+
+        # Save conversation history
+        with open(r"Data\ChatLog.json", "w") as f:
             dump(messages, f, indent=4)
-    
+
         return AnswerMofifier(Answer=Answer)
-    
+
     except Exception as e:
-       print(f"Enrror: {e}")
-       with open(r"Data\ChatLog.json", "w") as f:
-           dump([], f,indent=4)
-           return ChatBot(Query)
+        print(f"Error: {e}")
+        return "An error occurred. Please try again later."
+
     
 
 if __name__ == "__main__":
